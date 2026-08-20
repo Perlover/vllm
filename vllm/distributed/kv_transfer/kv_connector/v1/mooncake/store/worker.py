@@ -73,6 +73,7 @@ from vllm.v1.kv_cache_interface import (
     MLAAttentionSpec,
     SlidingWindowMLASpec,
     UniformTypeKVCacheSpecs,
+    group_kernel_blocks,
 )
 
 from .metrics import MooncakeStoreConnectorStats
@@ -1625,6 +1626,7 @@ class MooncakeStoreWorker:
         block_lens: list[int] = []
 
         for cache in kv_caches.values():
+            cache = group_kernel_blocks(cache, self.num_blocks)
             cache_storage = cache.untyped_storage()
             base_addr = cache_storage.data_ptr()
             region_len = cache_storage.nbytes()
